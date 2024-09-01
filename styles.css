@@ -1,0 +1,47 @@
+.carousel-item-background {
+    height: 300px;
+    background-color: #777;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+h2 {
+    text-align: center;
+}
+
+/* Adiciona margens verticais aos h2 para melhor espaçamento */
+h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+/* Adicionar logo como fundo da página */
+body {
+    padding-top: 50px;
+    background: url('') no-repeat center center fixed;
+    background-size: 1300px 1500px;
+    color: rgb(199, 199, 199);
+}
+
+/* Para garantir que o conteúdo seja legível sobre o fundo */
+section {
+    background: rgb(101, 0, 0);
+    padding: 50px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+.border-container {
+    border: 10px solid rgb(101,0,0); /* Cor da borda preta e espessura de 2px */
+    background-color: rgb(255, 255, 255);
+    padding: 15px; /* Espaçamento interno, opcional */
+    border-radius: 10px; /* Bordas arredondadas, opcional */
+}
+.section-title {
+    color: rgb(101, 0, 0); /* Substitua pelo código de cor desejado */
+}
+body {
+    background: url('../images/logo.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}

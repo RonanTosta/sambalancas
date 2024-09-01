@@ -1,0 +1,34 @@
+CREATE DATABASE SamBalancas;
+USE SamBalancas;
+CREATE TABLE usuarios 
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_usuario VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE servicos 
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_servico VARCHAR(100) NOT NULL,
+    descricao TEXT NOT NULL,
+    imagem VARCHAR(255),
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE parceiros 
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_parceiro VARCHAR(100) NOT NULL,
+    logo VARCHAR(255),
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+INSERT INTO usuarios (nome_usuario, senha) VALUES
+('rodrigoa', '002411'),
+('annac', '4599'),
+('ronant', '7753');
+

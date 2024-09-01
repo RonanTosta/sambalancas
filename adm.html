@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão SAM Balanças</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: black;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: rgb(101, 0, 0);
+            color: white;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            border-radius: 0 15px 15px 0;
+            z-index: 1000;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .sidebar a:hover {
+            background-color: #8B0000;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
+        }
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+        }
+        .section.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: black;
+        }
+        .form-group input[type="file"] {
+            padding: 0;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .client-list, .service-list, .partner-list {
+            margin-top: 20px;
+        }
+        .client-item, .service-item, .partner-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: black;
+        }
+        .client-item button, .service-item button, .partner-item button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+        }
+        .client-item button:hover, .service-item button:hover, .partner-item button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 onclick="showSection('inicio')">Menu</h2>
+        <a href="#servicos" onclick="showSection('servicos')">Serviços</a>
+        <a href="#parceiros" onclick="showSection('parceiros')">Parceiros</a>
+        <a href="#clientes" onclick="showSection('clientes')">Clientes</a>
+        <a href="home.php">Sair</a> <!-- Novo link "Home" adicionado -->
+    </div>
+    <div class="content" id="content">
+        <div class="section active" id="inicio">
+            <h2>Bem-vindo à Gestão SAM Balanças</h2>
+            <p>Escolha uma das opções no menu para começar.</p>
+        </div>
+
+        <div class="section" id="servicos">
+            <h2>Gerenciar Serviços</h2>
+            <div class="form-group actions">
+                <button type="button" onclick="showServiceForm()">Cadastrar Serviço</button>
+                <button type="button" onclick="listServices()">Consultar Serviços</button>
+            </div>
+            <div id="serviceForm" style="display:none;">
+                <h3>Inserir/Editar Serviço</h3>
+                <form action="salvar_servico.php" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="servicoTitulo">Título</label>
+                        <input type="text" id="servicoTitulo" name="servicoTitulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="servicoDescricao">Descrição</label>
+                        <textarea id="servicoDescricao" name="servicoDescricao" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="servicoImagem">Imagem do Serviço (800x600)</label>
+                        <input type="file" id="servicoImagem" name="servicoImagem" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="ativo">Ativo</label>
+                        <input type="checkbox" id="ativo" name="ativo" checked>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Salvar Serviço</button>
+                    </div>
+                </form>
+            </div>
+            <div id="serviceList" class="service-list" style="display:none;"></div>
+        </div>
+
+        <div class="section" id="parceiros">
+            <h2>Gerenciar Parceiros</h2>
+            <div class="form-group actions">
+                <button type="button" onclick="showPartnerForm()">Cadastrar Parceiro</button>
+                <button type="button" onclick="listPartners()">Consultar Parceiros</button>
+            </div>
+            <div id="partnerForm" style="display:none;">
+                <h3>Inserir/Editar Parceiro</h3>
+                <form action="salvar_parceiro.php" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="parceiroNome">Nome do Parceiro</label>
+                        <input type="text" id="parceiroNome" name="parceiroNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="parceiroLogo">Logo do Parceiro (400x400)</label>
+                        <input type="file" id="parceiroLogo" name="parceiroLogo" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="ativo">Ativo</label>
+                        <input type="checkbox" id="ativo" name="ativo" checked>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Salvar Parceiro</button>
+                    </div>
+                </form>
+            </div>
+            <div id="partnerList" class="partner-list" style="display:none;"></div>
+        </div>
+
+        <div class="section" id="clientes">
+            <h2>Gerenciar Clientes</h2>
+            <div class="form-group actions">
+                <button type="button" onclick="showClientForm()">Cadastrar Cliente</button>
+                <button type="button" onclick="listClients()">Consultar Clientes</button>
+            </div>
+            <div id="clientForm" style="display:none;">
+                <h3>Inserir/Editar Cliente</h3>
+                <form action="salvar_cliente.php" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="clienteNome">Nome do Cliente</label>
+                        <input type="text" id="clienteNome" name="clienteNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clienteLogo">Logo do Cliente (400x400)</label>
+                        <input type="file" id="clienteLogo" name="clienteLogo" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="ativo">Ativo</label>
+                        <input type="checkbox" id="ativo" name="ativo" checked>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Salvar Cliente</button>
+                    </div>
+                </form>
+            </div>
+            <div id="clientList" class="client-list" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function showServiceForm() {
+            document.getElementById('serviceForm').style.display = 'block';
+            document.getElementById('serviceList').style.display = 'none';
+        }
+
+        function listServices() {
+            document.getElementById('serviceForm').style.display = 'none';
+            document.getElementById('serviceList').style.display = 'block';
+
+            fetch('listar_servicos.php')
+                .then(response => response.json())
+                .then(data => {
+                    const serviceList = document.getElementById('serviceList');
+                    serviceList.innerHTML = '';
+                    data.forEach(servico => {
+                        const serviceItem = document.createElement('div');
+                        serviceItem.className = 'service-item';
+                        serviceItem.innerHTML = `
+                            <div>${servico.nome_servico} (${servico.ativo ? 'Ativo' : 'Inativo'})</div>
+                            <button onclick="editarServico(${servico.id})">Editar</button>
+                        `;
+                        serviceList.appendChild(serviceItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao listar serviços:', error);
+                });
+        }
+
+        function editarServico(id) {
+            fetch('buscar_servico.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('servicoTitulo').value = data.nome_servico;
+                    document.getElementById('servicoDescricao').value = data.descricao;
+                    document.getElementById('ativo').checked = data.ativo == 1;
+
+                    document.getElementById('serviceForm').style.display = 'block';
+                    document.getElementById('serviceList').style.display = 'none';
+
+                    let inputId = document.createElement('input');
+                    inputId.type = 'hidden';
+                    inputId.name = 'id';
+                    inputId.value = id;
+                    document.querySelector('#serviceForm form').appendChild(inputId);
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar serviço:', error);
+                });
+        }
+
+        function showPartnerForm() {
+            document.getElementById('partnerForm').style.display = 'block';
+            document.getElementById('partnerList').style.display = 'none';
+        }
+
+        function listPartners() {
+            document.getElementById('partnerForm').style.display = 'none';
+            document.getElementById('partnerList').style.display = 'block';
+
+            fetch('listar_parceiros.php')
+                .then(response => response.json())
+                .then(data => {
+                    const partnerList = document.getElementById('partnerList');
+                    partnerList.innerHTML = '';
+                    data.forEach(parceiro => {
+                        const partnerItem = document.createElement('div');
+                        partnerItem.className = 'partner-item';
+                        partnerItem.innerHTML = `
+                            <div>${parceiro.nome_parceiro} (${parceiro.ativo ? 'Ativo' : 'Inativo'})</div>
+                            <button onclick="editarParceiro(${parceiro.id})">Editar</button>
+                        `;
+                        partnerList.appendChild(partnerItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao listar parceiros:', error);
+                });
+        }
+
+        function editarParceiro(id) {
+            fetch('buscar_parceiro.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('parceiroNome').value = data.nome_parceiro;
+                    document.getElementById('ativo').checked = data.ativo == 1;
+
+                    document.getElementById('partnerForm').style.display = 'block';
+                    document.getElementById('partnerList').style.display = 'none';
+
+                    let inputId = document.createElement('input');
+                    inputId.type = 'hidden';
+                    inputId.name = 'id';
+                    inputId.value = id;
+                    document.querySelector('#partnerForm form').appendChild(inputId);
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar parceiro:', error);
+                });
+        }
+
+        function showClientForm() {
+            document.getElementById('clientForm').style.display = 'block';
+            document.getElementById('clientList').style.display = 'none';
+        }
+
+        function listClients() {
+            document.getElementById('clientForm').style.display = 'none';
+            document.getElementById('clientList').style.display = 'block';
+
+            fetch('listar_clientes.php')
+                .then(response => response.json())
+                .then(data => {
+                    const clientList = document.getElementById('clientList');
+                    clientList.innerHTML = '';
+                    data.forEach(cliente => {
+                        const clientItem = document.createElement('div');
+                        clientItem.className = 'client-item';
+                        clientItem.innerHTML = `
+                            <div>${cliente.nome_cliente} (${cliente.ativo ? 'Ativo' : 'Inativo'})</div>
+                            <button onclick="editarCliente(${cliente.id})">Editar</button>
+                        `;
+                        clientList.appendChild(clientItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao listar clientes:', error);
+                });
+        }
+
+        function editarCliente(id) {
+            fetch('buscar_cliente.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('clienteNome').value = data.nome_cliente;
+                    document.getElementById('ativo').checked = data.ativo == 1;
+
+                    document.getElementById('clientForm').style.display = 'block';
+                    document.getElementById('clientList').style.display = 'none';
+
+                    let inputId = document.createElement('input');
+                    inputId.type = 'hidden';
+                    inputId.name = 'id';
+                    inputId.value = id;
+                    document.querySelector('#clientForm form').appendChild(inputId);
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar cliente:', error);
+                });
+        }
+    </script>
+</body>
+</html>
